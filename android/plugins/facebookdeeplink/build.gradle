@@ -1,0 +1,77 @@
+// Root buildscript
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.0.0'
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+// Apply Android library plugin
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 33
+    namespace 'org.godotengine.godot'
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 33
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // Godot library from Maven Central - required for compilation but not bundled in AAR
+    // Godot provides this at runtime, so we use compileOnly scope
+    compileOnly 'org.godotengine:godot:4.5.1.stable'
+    
+    implementation 'com.facebook.android:facebook-android-sdk:16.0.0'
+}
+
+// Task to copy AAR to plugin directory after build
+task copyAarToPlugin {
+    doLast {
+        def aarFiles = fileTree('build/outputs/aar').include('*.aar').files
+        if (!aarFiles.isEmpty()) {
+            def sourceFile = aarFiles.first()
+            def destFile = file('facebookdeeplink.aar')
+            // Delete existing file if present
+            if (destFile.exists()) {
+                destFile.delete()
+            }
+            // Copy the AAR file
+            ant.copy(file: sourceFile, tofile: destFile, overwrite: true)
+            println "Copied ${sourceFile.name} to facebookdeeplink.aar"
+        } else {
+            println "WARNING: No AAR file found in build/outputs/aar"
+        }
+    }
+    doNotTrackState()
+}
+
+afterEvaluate {
+    tasks.named('assembleRelease').configure {
+        finalizedBy copyAarToPlugin
+    }
+}

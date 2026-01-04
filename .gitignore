@@ -1,0 +1,27 @@
+# Output folder contents (distribution files)
+android/plugins/facebookdeeplink/output/*
+
+# Keep the output directory structure
+!android/plugins/facebookdeeplink/output/.gitkeep
+
+# Build artifacts
+android/plugins/facebookdeeplink/build/
+android/plugins/facebookdeeplink/.gradle/
+android/plugins/facebookdeeplink/.idea/
+android/plugins/facebookdeeplink/local.properties
+
+# Gradle
+android/plugins/facebookdeeplink/gradle/wrapper/gradle-wrapper.jar
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.vscode/
+.idea/
+
